@@ -1,0 +1,29 @@
+name: Build Vizy SEO Plugin ZIP
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'vizy-seo/**'
+      - '.github/workflows/build-vizy-seo.yml'
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate source
+        run: |
+          test -f vizy-seo/vizy-seo.php
+          find vizy-seo -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Package installable WordPress plugin
+        run: |
+          mkdir -p dist
+          zip -qr dist/Vizy-SEO-1.1.2.zip vizy-seo -x "*/.git/*" "*/.DS_Store"
+          unzip -t dist/Vizy-SEO-1.1.2.zip
+      - name: Upload download artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Vizy-SEO-1.1.2
+          path: dist/Vizy-SEO-1.1.2.zip
+          retention-days: 90
